@@ -1,46 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <!-- Force light appearance on phones (keeps yellow from turning brown) -->
-  <meta name="color-scheme" content="light">
-  <meta name="theme-color" content="#FFF7C8">
-  <title>Wedding Quiz · Start</title>
+  <title>Wedding Quiz</title>
+  <link rel="stylesheet" href="styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
 </head>
-<body data-page="landing">
-  <div class="wrap">
-    <header class="hero">
-      <h1>Wedding Quiz / ウェディングクイズ</h1>
-      <p class="sub">Jan 24 · 12:30–14:30 · Thank you for celebrating with us / ご出席ありがとうございます ✨</p>
-      <div class="sparkles" aria-hidden="true"><span>✨</span><span>⭐</span><span>✨</span><span>🌟</span><span>✨</span><span>💫</span><span>✨</span></div>
+<body>
+  <div class="container">
+    <!-- HEADER -->
+    <header class="hero panel">
+      <h1 id="siteTitle">Wedding Quiz</h1>
+      <p id="siteTag">Choose Bride or Groom · 日本語 / English</p>
+      <div class="bow-row" aria-hidden="true">
+        <span class="bow"></span><span class="bow"></span><span class="bow"></span>
+      </div>
     </header>
 
+    <!-- LANGUAGE -->
     <section class="panel">
-      <h2 class="section-title">Language / 言語</h2>
-      <div class="btn-row" id="langRow">
-        <button class="btn" data-lang="en">English 🇬🇧</button>
-        <button class="btn" data-lang="jp">日本語 🇯🇵</button>
+      <h2 class="section-title" id="langTitle">✨ Language / 言語</h2>
+      <div class="lang-toggle">
+        <button class="btn" data-lang="en">English</button>
+        <button class="btn" data-lang="ja">日本語</button>
       </div>
     </section>
 
+    <!-- SIDE SELECT -->
     <section class="panel">
-      <h2 class="section-title" id="chooseSideTitle">Choose your side</h2>
-      <div class="btn-row" id="sideRow">
-        <button class="btn" data-side="bride">Bride 💖</button>
-        <button class="btn" data-side="groom">Groom 🤵</button>
+      <h2 class="section-title" id="startTitle">✨ Start</h2>
+      <div class="answers">
+        <button class="btn" id="btnBride">Bride</button>
+        <button class="btn" id="btnGroom">Groom</button>
       </div>
+      <p class="help" id="startHelp">Pick a side and your language.</p>
     </section>
 
-    <section class="panel center">
-      <button id="startBtn" class="btn big" disabled>Start</button>
-      <p id="hint" class="help">Pick a language and a side first.</p>
+    <!-- QUIZ -->
+    <section id="quizArea" class="panel" style="display:none;">
+      <div class="level-header">
+        <span id="levelBadge" class="badge">Level: Easy</span>
+        <span id="mistakesBadge" class="badge">Mistakes: 0 / 5</span>
+      </div>
+      <div id="questionText" class="q"></div>
+      <div id="answers" class="answers"></div>
+      <button id="nextBtn" class="btn" disabled>Next</button>
     </section>
+
+    <!-- RESULT -->
+    <section id="resultArea" class="panel" style="display:none;">
+      <h2 class="section-title" id="resultTitle">🎀 Result</h2>
+      <p id="resultText"></p>
+      <button class="btn" id="restartBtn">Restart</button>
+    </section>
+
+    <footer class="footer" id="footerNote">♡ Made with bows & sparkles ♡</footer>
   </div>
 
-  <script src="lang.js"></script>
-  <script src="script.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
