@@ -4,8 +4,51 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Wedding Quiz</title>
-  <link rel="stylesheet" href="styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#FFE6F6; --panel:#fff; --ink:#1A1225;
+      --accent:#E72E7A; --accent-dark:#B31E5B; --accent-soft:#FFD5EA;
+      --border:#F6A9C9; --grid:#FFF1F8; --success:#26a269; --error:#d7263d;
+      --radius:16px; --shadow:6px 6px 0 var(--accent-dark);
+      --h1:clamp(20px,3.5vw,28px); --h2:clamp(16px,2.6vw,20px); --p:clamp(13px,2.2vw,15px);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; color:var(--ink);
+      font-family:'Press Start 2P',system-ui,sans-serif; line-height:1.6;
+      background:
+        repeating-linear-gradient(0deg,var(--grid) 0 2px,transparent 2px 22px),
+        repeating-linear-gradient(90deg,var(--grid) 0 2px,transparent 2px 22px),
+        var(--bg);
+    }
+    .container{max-width:960px;margin:0 auto;padding:20px 16px 120px}
+    .panel{background:var(--panel);border:4px solid var(--ink);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin:16px 0}
+    .hero h1{margin:0 0 6px;font-size:var(--h1);text-align:center}
+    .hero p{margin:0;font-size:var(--p);opacity:.85;text-align:center;color:var(--accent-dark)}
+    .bow-row{display:flex;justify-content:center;gap:10px;margin-top:10px}
+    .bow{width:28px;height:20px;background:var(--accent);border-radius:6px;filter:drop-shadow(2px 2px 0 var(--ink))}
+    .section-title{display:flex;align-items:center;gap:8px;margin:0 0 12px;font-size:var(--h2);color:var(--accent-dark)}
+    .section-title::after{content:"✦";color:var(--accent)}
+    .btn{
+      background:var(--accent); color:#fff; border:3px solid var(--accent-dark);
+      box-shadow:4px 4px 0 var(--accent-dark); border-radius:14px; padding:12px 16px;
+      font:inherit; font-weight:600; cursor:pointer;
+    }
+    .btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--accent-dark)}
+    .btn[disabled]{opacity:.6;cursor:not-allowed}
+    .lang-toggle{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+    .answers{display:grid;gap:10px;grid-template-columns:repeat(2,1fr)}
+    @media(max-width:700px){.answers{grid-template-columns:1fr}}
+    .answer{border:2px solid var(--border);border-radius:12px;padding:12px;background:#fff;cursor:pointer}
+    .answer:hover{background:var(--accent-soft);border-color:var(--accent)}
+    .answer.selected{border-color:var(--accent);background:var(--accent-soft)}
+    .badge{display:inline-block;padding:6px 10px;border:2px solid var(--ink);border-radius:9999px;background:#fff;font-size:12px}
+    .level-header{display:flex;justify-content:space-between;margin-bottom:10px}
+    .footer{text-align:center;font-size:12px;opacity:.7;margin-top:24px}
+    .q{font-size:14px;margin-bottom:8px}
+  </style>
 </head>
 <body>
   <div class="container">
@@ -13,9 +56,7 @@
     <header class="hero panel">
       <h1 id="siteTitle">Wedding Quiz</h1>
       <p id="siteTag">Choose Bride or Groom · 日本語 / English</p>
-      <div class="bow-row" aria-hidden="true">
-        <span class="bow"></span><span class="bow"></span><span class="bow"></span>
-      </div>
+      <div class="bow-row" aria-hidden="true"><span class="bow"></span><span class="bow"></span><span class="bow"></span></div>
     </header>
 
     <!-- LANGUAGE -->
@@ -34,7 +75,7 @@
         <button class="btn" id="btnBride">Bride</button>
         <button class="btn" id="btnGroom">Groom</button>
       </div>
-      <p class="help" id="startHelp">Pick a side and your language.</p>
+      <p class="help" id="startHelp" style="font-size:12px;opacity:.8;margin-top:8px;">Pick a side and your language.</p>
     </section>
 
     <!-- QUIZ -->
@@ -58,6 +99,254 @@
     <footer class="footer" id="footerNote">♡ Made with bows & sparkles ♡</footer>
   </div>
 
-  <script src="app.js"></script>
+  <script>
+    /* ========= UI TEXTS ========= */
+    const UI = {
+      en: {
+        siteTitle:"Wedding Quiz", siteTag:"Choose Bride or Groom · 日本語 / English",
+        langTitle:"✨ Language / 言語", startTitle:"✨ Start", startHelp:"Pick a side and your language.",
+        level:"Level", mistakes:"Mistakes", next:"Next", result:"🎀 Result",
+        prize:"You cleared all levels! 🎉 Show this screen for your prize!",
+        fail:"Too many mistakes 💔 Please try again.", restart:"Restart",
+        bride:"Bride", groom:"Groom", coming:"Coming soon ✦",
+        levelNames:{easy:"Easy",medium:"Medium",hard:"Hard",superhard:"Super Hard"}
+      },
+      ja: {
+        siteTitle:"ウェディングクイズ", siteTag:"花嫁・花婿を選んでください · English / 日本語",
+        langTitle:"✨ 言語 / Language", startTitle:"✨ スタート", startHelp:"どちらのクイズに挑戦しますか？ 言語も選べます。",
+        level:"レベル", mistakes:"ミス", next:"次へ", result:"🎀 結果",
+        prize:"全レベルクリア！🎉 この画面を受付に見せてください。", fail:"ミスが多すぎます 💔 もう一度お試しください。",
+        restart:"リスタート", bride:"花嫁", groom:"花婿", coming:"近日追加 ✦",
+        levelNames:{easy:"かんたん",medium:"ふつう",hard:"むずかしい",superhard:"超むずかしい"}
+      }
+    };
+
+    /* ========= QUESTIONS ========= */
+    const QUESTIONS = {
+      en: {
+        bride: {
+          easy:[
+            {q:"What is the bride's favorite color?",a:["Yellow","Blue","Pink"],correct:1},
+            {q:"What is the bride's favorite animal?",a:["Hamster","Cat","Dog"],correct:0},
+            {q:"Who is the bride's favorite artist?",a:["Taylor Swift","Sabrina Carpenter","Gracie Abrams"],correct:0}
+          ],
+          medium:[
+            {q:"What kind of jewelry does the bride usually wear?",a:["Gold","Silver","Rose Gold"],correct:1},
+            {q:"What is the most used app on the bride’s phone?",a:["Mercari","ChatGPT","UberEats"],correct:1},
+            {q:"Which activity is the bride most likely to say no to?",a:["Going camping","Running a marathon","Hiking a mountain"],correct:0}
+          ],
+          hard:[
+            {q:"What’s the bride’s favorite Taylor Swift album?",a:["Folklore","Midnights","Reputation"],correct:0},
+            {q:"Which best explains the bride’s origin story?",a:[
+              "Tried to reinvent herself five times in high school",
+              "Unsuccessfully tried to win her parents’ love through overachieving",
+              "Mastered obscure hobbies"
+            ],correct:1},
+            {q:"What’s the bride & groom’s favorite place to eat on a night out?",a:["Hama Sushi","Saizeriya","Torikizoku"],correct:1}
+          ],
+          superhard:[
+            {q:"Which Pokémon sticker is on the bride’s phone case?",a:["Chikorita","Skitty","Bulbasaur"],correct:2},
+            {q:"(TBD)",a:["A","B","C"],correct:0,placeholder:true},
+            {q:"(TBD)",a:["A","B","C"],correct:0,placeholder:true}
+          ]
+        },
+        groom: {
+          easy:[
+            {q:"What’s the groom’s go-to drink order at a bar?",a:[
+              "Draft beer and lemon sour","Whiskey highball and shochu mizuwari","Red wine and gin tonic"
+            ],correct:0},
+            {q:"What’s the groom’s favorite sneaker brand?",a:["Nike Jordans","Adidas Superstars","Converse All Stars"],correct:0},
+            {q:"What’s the groom’s go-to drinking area?",a:["Sangenjaya","Ueno","Akihabara"],correct:1}
+          ],
+          medium:[
+            {q:"What type of car does the groom drive?",a:["Toyota Aqua","Honda Fit","Nissan Note"],correct:0},
+            {q:"(TBD)",a:["A","B","C"],correct:0,placeholder:true},
+            {q:"(TBD)",a:["A","B","C"],correct:0,placeholder:true}
+          ],
+          hard:[
+            {q:"(TBD)",a:["A","B","C"],correct:0,placeholder:true},
+            {q:"(TBD)",a:["A","B","C"],correct:0,placeholder:true},
+            {q:"(TBD)",a:["A","B","C"],correct:0,placeholder:true}
+          ],
+          superhard:[
+            {q:"(TBD)",a:["A","B","C"],correct:0,placeholder:true},
+            {q:"(TBD)",a:["A","B","C"],correct:0,placeholder:true},
+            {q:"(TBD)",a:["A","B","C"],correct:0,placeholder:true}
+          ]
+        }
+      },
+      ja: {
+        bride: {
+          easy:[
+            {q:"花嫁の好きな色は？",a:["黄色","青","ピンク"],correct:1},
+            {q:"花嫁の好きな動物は？",a:["ハムスター","猫","犬"],correct:0},
+            {q:"花嫁の一番好きなアーティストは？",a:["テイラー・スウィフト","サブリナ・カーペンター","グレイシー・エイブラムス"],correct:0}
+          ],
+          medium:[
+            {q:"花嫁が普段身につけるアクセサリーは？",a:["ゴールド","シルバー","ローズゴールド"],correct:1},
+            {q:"花嫁がスマホで一番使うアプリは？",a:["メルカリ","ChatGPT","ウーバーイーツ"],correct:1},
+            {q:"花嫁が一番『ノー！』と言いそうなのは？",a:["キャンプに行くこと","フルマラソンに出ること","山登りをすること"],correct:0}
+          ],
+          hard:[
+            {q:"花嫁の好きなテイラー・スウィフトのアルバムは？",a:["フォークロア","ミッドナイツ","レピュテーション"],correct:0},
+            {q:"花嫁の“人格形成のきっかけ”として一番当てはまるのは？",a:[
+              "高校時代に何度もキャラ替えした",
+              "親の愛を勝ち取ろうとして過剰に頑張ってしまった",
+              "マニアックな趣味を極めた"
+            ],correct:1},
+            {q:"ふたりが夜ごはんでよく行くお店は？",a:["はま寿司","サイゼリヤ","鳥貴族"],correct:1}
+          ],
+          superhard:[
+            {q:"花嫁のスマホケースに貼ってあるポケモンのステッカーは？",a:["チコリータ","エネコ","フシギダネ"],correct:2},
+            {q:"（未定）",a:["A","B","C"],correct:0,placeholder:true},
+            {q:"（未定）",a:["A","B","C"],correct:0,placeholder:true}
+          ]
+        },
+        groom: {
+          easy:[
+            {q:"花婿の定番ドリンク注文は？",a:["生ビール＋レモンサワー","ウイスキーハイボール＋焼酎水割り","赤ワイン＋ジントニック"],correct:0},
+            {q:"花婿の好きなスニーカーブランドは？",a:["ナイキ・ジョーダン","アディダス・スーパースター","コンバース・オールスター"],correct:0},
+            {q:"花婿がよく飲みに行くエリアは？",a:["三軒茶屋","上野","秋葉原"],correct:1}
+          ],
+          medium:[
+            {q:"花婿が運転している車は？",a:["トヨタ・アクア","ホンダ・フィット","日産・ノート"],correct:0},
+            {q:"（未定）",a:["A","B","C"],correct:0,placeholder:true},
+            {q:"（未定）",a:["A","B","C"],correct:0,placeholder:true}
+          ],
+          hard:[
+            {q:"（未定）",a:["A","B","C"],correct:0,placeholder:true},
+            {q:"（未定）",a:["A","B","C"],correct:0,placeholder:true},
+            {q:"（未定）",a:["A","B","C"],correct:0,placeholder:true}
+          ],
+          superhard:[
+            {q:"（未定）",a:["A","B","C"],correct:0,placeholder:true},
+            {q:"（未定）",a:["A","B","C"],correct:0,placeholder:true},
+            {q:"（未定）",a:["A","B","C"],correct:0,placeholder:true}
+          ]
+        }
+      }
+    };
+
+    /* ========= STATE ========= */
+    let lang='en', side=null;
+    const levels=['easy','medium','hard','superhard'];
+    let levelIndex=0, qIndex=0, mistakes=0;
+    const MAX_MISTAKES=5;
+
+    const quizArea=document.getElementById('quizArea');
+    const resultArea=document.getElementById('resultArea');
+    const questionText=document.getElementById('questionText');
+    const answersBox=document.getElementById('answers');
+    const levelBadge=document.getElementById('levelBadge');
+    const mistakesBadge=document.getElementById('mistakesBadge');
+    const nextBtn=document.getElementById('nextBtn');
+    const restartBtn=document.getElementById('restartBtn');
+    const siteTitle=document.getElementById('siteTitle');
+    const siteTag=document.getElementById('siteTag');
+    const langTitle=document.getElementById('langTitle');
+    const startTitle=document.getElementById('startTitle');
+    const startHelp=document.getElementById('startHelp');
+    const resultTitle=document.getElementById('resultTitle');
+    const btnBride=document.getElementById('btnBride');
+    const btnGroom=document.getElementById('btnGroom');
+
+    const L=()=>UI[lang]; const Q=()=>QUESTIONS[lang];
+
+    function applyUILabels(){
+      const t=L();
+      siteTitle.textContent=t.siteTitle; siteTag.textContent=t.siteTag;
+      langTitle.textContent=t.langTitle; startTitle.textContent=t.startTitle;
+      startHelp.textContent=t.startHelp; resultTitle.textContent=t.result;
+      btnBride.textContent=t.bride; btnGroom.textContent=t.groom;
+      nextBtn.textContent=t.next;
+    }
+
+    function currentList(){ return Q()[side][levels[levelIndex]] || []; }
+
+    function render(){
+      const t=L(), key=levels[levelIndex], list=currentList();
+      levelBadge.textContent = `${t.level}: ${t.levelNames[key]}`;
+      mistakesBadge.textContent = `${t.mistakes}: ${mistakes} / ${MAX_MISTAKES}`;
+
+      if (!list.length){
+        questionText.textContent = 'No questions found.';
+        answersBox.innerHTML = '';
+        nextBtn.disabled = true;
+        return;
+      }
+
+      const q = list[qIndex];
+      questionText.textContent = q.q;
+      answersBox.innerHTML = '';
+      nextBtn.disabled = true;
+
+      if (q.placeholder){
+        const p=document.createElement('p');
+        p.textContent=t.coming;
+        answersBox.appendChild(p);
+        nextBtn.disabled=false;
+        return;
+      }
+
+      q.a.forEach((text,i)=>{
+        const div=document.createElement('div');
+        div.className='answer'; div.textContent=text;
+        div.addEventListener('click',()=>{
+          answersBox.querySelectorAll('.answer').forEach(a=>a.classList.remove('selected'));
+          div.classList.add('selected');
+          nextBtn.disabled=false;
+          if(i!==q.correct){
+            mistakes++;
+            mistakesBadge.textContent = `${t.mistakes}: ${mistakes} / ${MAX_MISTAKES}`;
+            if(mistakes>=MAX_MISTAKES){ end(false); }
+          }
+        });
+        answersBox.appendChild(div);
+      });
+    }
+
+    function end(success){
+      const t=L();
+      quizArea.style.display='none';
+      resultArea.style.display='block';
+      document.getElementById('resultText').textContent = success ? t.prize : t.fail;
+    }
+
+    function start(sideKey){
+      side=sideKey; levelIndex=0; qIndex=0; mistakes=0;
+      resultArea.style.display='none';
+      quizArea.style.display='block';
+      render();
+    }
+
+    // events
+    document.querySelectorAll('.lang-toggle .btn').forEach(b=>{
+      b.addEventListener('click',()=>{
+        lang=b.getAttribute('data-lang')||'en';
+        applyUILabels();
+        if(side) render();
+      });
+    });
+    btnBride.addEventListener('click',()=>start('bride'));
+    btnGroom.addEventListener('click',()=>start('groom'));
+    nextBtn.addEventListener('click',()=>{
+      const list=currentList();
+      qIndex++;
+      if(qIndex>=list.length){
+        levelIndex++;
+        if(levelIndex>=levels.length){ end(true); return; }
+        qIndex=0;
+      }
+      render();
+    });
+    restartBtn.addEventListener('click',()=>{
+      resultArea.style.display='none';
+      quizArea.style.display='none';
+      side=null;
+    });
+
+    // init
+    applyUILabels();
+  </script>
 </body>
 </html>
