@@ -1,0 +1,8 @@
+{
+  "levels": [
+    { "name": "Easy", "questions": [] },
+    { "name": "Middle", "questions": [] },
+    { "name": "Hard", "questions": [] },
+    { "name": "Super Hard", "questions": [] }
+  ]
+}
