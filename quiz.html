@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <!-- Force light appearance on phones -->
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#FFF7C8">
   <title>Wedding Quiz · Levels</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
@@ -10,14 +13,16 @@
 <body data-page="quiz">
   <div class="wrap">
     <header class="hero">
-      <h1 id="quizTitle">Wedding Quiz</h1>
+      <h1 id="quizTitle">Wedding Quiz / ウェディングクイズ</h1>
       <p class="sub" id="quizSubtitle"></p>
+      <div class="sparkles" aria-hidden="true"><span>✨</span><span>⭐</span><span>✨</span><span>🌟</span><span>✨</span><span>💫</span><span>✨</span></div>
     </header>
 
     <section class="panel">
       <h2 class="section-title" id="levelsTitle">Levels</h2>
       <div id="levelsGrid" class="grid"></div>
       <p class="help" id="levelsHelp"></p>
+      <p class="help"><span class="badge" id="mistakesBadge"></span></p>
     </section>
 
     <!-- Quiz runner -->
@@ -26,6 +31,7 @@
         <div class="q-header">
           <div class="badge" id="qCounter"></div>
           <div class="badge" id="qLevelName"></div>
+          <div class="badge danger" id="qMistakesLeft"></div>
         </div>
         <div class="q-title" id="qText"></div>
         <div class="choices" id="qChoices"></div>
@@ -44,6 +50,17 @@
         <h2 class="prize-title" id="prizeTitle"></h2>
         <p id="prizeLine1"></p>
         <p id="prizeLine2"></p>
+      </div>
+    </section>
+
+    <!-- Game Over screen -->
+    <section class="panel" id="gameover" style="display:none">
+      <div class="prize-card">
+        <div class="prize-sticker">💥</div>
+        <h2 class="prize-title" id="goTitle">Game Over / ゲームオーバー</h2>
+        <p id="goLine1"></p>
+        <p id="goLine2"></p>
+        <button class="btn" id="goResetBtn">Restart</button>
       </div>
     </section>
 
