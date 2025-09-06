@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Wedding Quiz · Start</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-page="landing">
+  <div class="wrap">
+    <header class="hero">
+      <h1>Wedding Quiz</h1>
+      <p class="sub">Jan 24 · 12:30–14:30 · Thank you for celebrating with us ✨</p>
+      <div class="sparkles" aria-hidden="true"><span>✨</span><span>⭐</span><span>✨</span></div>
+    </header>
+
+    <section class="panel">
+      <h2 class="section-title">Language / 言語</h2>
+      <div class="btn-row" id="langRow">
+        <button class="btn" data-lang="en">English 🇬🇧</button>
+        <button class="btn" data-lang="jp">日本語 🇯🇵</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2 class="section-title" id="chooseSideTitle">Choose your side</h2>
+      <div class="btn-row" id="sideRow">
+        <button class="btn" data-side="bride">Bride 💖</button>
+        <button class="btn" data-side="groom">Groom 🤵</button>
+      </div>
+    </section>
+
+    <section class="panel center">
+      <button id="startBtn" class="btn big" disabled>Start</button>
+      <p id="hint" class="help">Pick a language and a side first.</p>
+    </section>
+  </div>
+
+  <script src="lang.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
