@@ -5,7 +5,8 @@ const STORAGE_KEY = (side,lang)=>`wq_progress_${side}_${lang}`;
 
 // config
 const QUESTIONS_PER_LEVEL = 3;
-const PASS_NEEDED = 2; // need >=2 correct out of 3
+const PASS_NEEDED = 2; // need >=2/3 correct to clear a level
+const MAX_WRONG_TOTAL = 5; // total mistakes allowed across the whole run
 
 /* ---------------- LANDING ---------------- */
 function initLanding(){
@@ -69,10 +70,22 @@ async function initQuiz(){
 
   ensureDemoQuestions(quizData, lang); // placeholder questions so you can test
 
+  // load or init progress
   const prog = loadProgress(side,lang, quizData.levels.length);
+  updateMistakesUI(t, prog);
+
   renderLevels(quizData, prog, t, side, lang);
 
   $('#backBtn').addEventListener('click', ()=> history.back());
+  $('#goResetBtn').addEventListener('click', ()=>{
+    // full reset
+    const cleared = Array(quizData.levels.length).fill(false);
+    const reset = { cleared, wrongTotal: 0 };
+    saveProgress(side,lang, reset);
+    $('#gameover').style.display='none';
+    renderLevels(quizData, reset, t, side, lang);
+    updateMistakesUI(t, reset);
+  });
 }
 
 function ensureDemoQuestions(data, lang){
@@ -107,11 +120,12 @@ function ensureDemoQuestions(data, lang){
 
 function loadProgress(side,lang, nLevels){
   const raw = localStorage.getItem(STORAGE_KEY(side,lang));
-  const base = { cleared:Array(nLevels).fill(false) };
+  const base = { cleared:Array(nLevels).fill(false), wrongTotal: 0 };
   if(!raw) return base;
   try{
     const o = JSON.parse(raw);
-    if(!o.cleared || o.cleared.length!==nLevels) return base;
+    if(!o.cleared || o.cleared.length!==nLevels) o.cleared = Array(nLevels).fill(false);
+    if(typeof o.wrongTotal!=='number') o.wrongTotal = 0;
     return o;
   }catch{ return base; }
 }
@@ -119,7 +133,21 @@ function saveProgress(side,lang, prog){
   localStorage.setItem(STORAGE_KEY(side,lang), JSON.stringify(prog));
 }
 
+function updateMistakesUI(t, prog){
+  const left = Math.max(0, MAX_WRONG_TOTAL - (prog.wrongTotal||0));
+  const b1 = $('#mistakesBadge');
+  const b2 = $('#qMistakesLeft');
+  if(b1) b1.textContent = t.mistakesLeft(left);
+  if(b2) b2.textContent = t.mistakesLeft(left);
+}
+
 function renderLevels(quizData, prog, t, side, lang){
+  // if already at or over limit, show game over
+  if((prog.wrongTotal||0) >= MAX_WRONG_TOTAL){
+    showGameOver(t);
+    return;
+  }
+
   const grid = $('#levelsGrid');
   const names = t.levelNames;
   grid.innerHTML = '';
@@ -154,6 +182,7 @@ function renderLevels(quizData, prog, t, side, lang){
 /* ---------------- RUN A LEVEL ---------------- */
 function startLevel(i, levelData, ctx, t, prog, quizData){
   $('#prize').style.display='none';
+  $('#gameover').style.display='none';
   const runner = $('#runner');
   runner.style.display='block';
 
@@ -172,11 +201,18 @@ function startLevel(i, levelData, ctx, t, prog, quizData){
   qLevelName.textContent = (t.levelNames[i] || levelData.name);
 
   function render(){
+    // stop if we hit mistake cap mid-level
+    if((prog.wrongTotal||0) >= MAX_WRONG_TOTAL){
+      runner.style.display='none';
+      showGameOver(t);
+      return;
+    }
+
     const item = levelData.questions[idx];
     qCounter.textContent = t.questionOf(idx+1, total);
     qText.textContent = item.q;
     qChoices.innerHTML = '';
-    item.choices.forEach((c,ci)=>{
+    item.choices.forEach((c)=>{
       const b = document.createElement('button');
       b.type='button';
       b.className='choice';
@@ -190,13 +226,26 @@ function startLevel(i, levelData, ctx, t, prog, quizData){
     submitBtn.textContent = (idx===total-1)? t.submit : t.next;
     skipBtn.textContent = t.backToLevels;
     qResult.style.display='none';
+
+    updateMistakesUI(t, prog);
   }
 
   submitBtn.onclick = ()=>{
     const picked = Array.from(qChoices.children).find(x=>x.classList.contains('selected'));
     if(!picked){ alert(t.selectChoice); return; }
     const sel = Array.from(qChoices.children).indexOf(picked);
-    if(sel === levelData.questions[idx].answer) correct++;
+    if(sel === levelData.questions[idx].answer) {
+      correct++;
+    } else {
+      prog.wrongTotal = (prog.wrongTotal||0) + 1;
+      saveProgress(ctx.side, ctx.lang, prog);
+      updateMistakesUI(t, prog);
+      if(prog.wrongTotal >= MAX_WRONG_TOTAL){
+        $('#runner').style.display='none';
+        showGameOver(t);
+        return;
+      }
+    }
 
     idx++;
     if(idx>=total){
@@ -229,10 +278,20 @@ function startLevel(i, levelData, ctx, t, prog, quizData){
 }
 
 function showPrize(t){
+  $('#gameover').style.display='none';
   const box = $('#prize');
   $('#prizeTitle').textContent = t.prizeTitle;
   $('#prizeLine1').textContent = t.prizeLine1;
   $('#prizeLine2').textContent = t.prizeLine2;
+  box.style.display = 'block';
+}
+
+function showGameOver(t){
+  $('#prize').style.display='none';
+  const box = $('#gameover');
+  $('#goLine1').textContent = t.goLine1;
+  $('#goLine2').textContent = t.goLine2;
+  $('#goResetBtn').textContent = t.restart;
   box.style.display = 'block';
 }
 
