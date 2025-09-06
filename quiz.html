@@ -20,6 +20,33 @@
       <p class="help" id="levelsHelp"></p>
     </section>
 
+    <!-- Quiz runner -->
+    <section class="panel runner" id="runner" style="display:none">
+      <div class="question-card">
+        <div class="q-header">
+          <div class="badge" id="qCounter"></div>
+          <div class="badge" id="qLevelName"></div>
+        </div>
+        <div class="q-title" id="qText"></div>
+        <div class="choices" id="qChoices"></div>
+        <div class="runner-actions">
+          <button class="btn" id="submitBtn"></button>
+          <button class="btn ghost" id="skipBtn"></button>
+        </div>
+        <div class="result-card" id="qResult" style="display:none"></div>
+      </div>
+    </section>
+
+    <!-- Prize screen -->
+    <section class="panel" id="prize" style="display:none">
+      <div class="prize-card">
+        <div class="prize-sticker">✨⭐✨</div>
+        <h2 class="prize-title" id="prizeTitle"></h2>
+        <p id="prizeLine1"></p>
+        <p id="prizeLine2"></p>
+      </div>
+    </section>
+
     <section class="panel center">
       <button class="btn ghost" id="backBtn">← Back</button>
     </section>
